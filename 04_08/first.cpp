@@ -103,35 +103,49 @@ public:
 
 class CycleVisitor : public Visitor {
 public:
-    void BackEdge(VertexId, VertexId) override {
-        hasCycle_ = true;
-        // here we can obtain cycle from parents array
-        // parents can be saved in TreeEdge
+    explicit CycleVisitor(VertexId numVertices) : parents_(numVertices) {
+    }
+
+    void BackEdge(VertexId from, VertexId to) override {
+        if (cycle_.empty() && parents_[from] != to) {
+            // YOUR CODE GOES HERE
+            // This is the cycle (undirected graph)
+        }
+    }
+
+    void TreeEdge(VertexId from, VertexId to) override {
+        // YOUR CODE GOES HERE
+        // Save to parents_
     }
 
     void PrintCycle() const {
-        std::cout << std::boolalpha << hasCycle_ << std::endl;
+        if (cycle_.empty()) {
+            std::cout << "NO\n";
+        } else {
+            std::cout << "YES\n";
+            // YOUR CODE GOES HERE
+        }
     }
 
-    bool hasCycle_ = false;
+    std::vector<VertexId> cycle_;
     std::vector<VertexId> parents_;
 };
 
 void Dfs(const Graph& graph, Graph::VertexId vertex, std::vector<Color>& colors, Visitor& visitor) {
-    colors[vertex] = Color::GRAY;
     visitor.DiscoverVertex(vertex);
+    colors[vertex] = Color::GRAY;
     for (Graph::VertexId neighbor : graph.GetNeighbors(vertex)) {
         if (colors[neighbor] == Color::WHITE) {
-            Dfs(graph, neighbor, colors, visitor);
             visitor.TreeEdge(vertex, neighbor);
+            Dfs(graph, neighbor, colors, visitor);
         } else if (colors[neighbor] == Color::GRAY) {
             visitor.BackEdge(vertex, neighbor);
         } else {
             visitor.ForwardOrCrossEdge(vertex, neighbor);
         }
     }
-    colors[vertex] = Color::BLACK;
     visitor.FinishVertex(vertex);
+    colors[vertex] = Color::BLACK;
 }
 
 void Dfs(const Graph& graph, Visitor& visitor) {
@@ -143,27 +157,46 @@ void Dfs(const Graph& graph, Visitor& visitor) {
     }
 }
 
-int main() {
-    std::cin.tie(nullptr);
-    std::ios_base::sync_with_stdio(false);
+//int main() {
+//    std::cin.tie(nullptr);
+//    std::ios_base::sync_with_stdio(false);
+//
+//    auto graph = ReadUndirectedGraph();
+//    ComponentVisitor visitor;
+//
+//    std::vector<Color> colors(graph.NumVertices());
+//    Dfs(graph, 0, colors, visitor);
+//
+//    visitor.PrintComponent();
+//}
 
-    auto graph = ReadUndirectedGraph();
-    ComponentVisitor visitor;
-
-    std::vector<Color> colors(graph.NumVertices());
-    Dfs(graph, 0, colors, visitor);
-
-    visitor.PrintComponent();
+Graph ReadAdjMatrix() {
+    Graph graph;
+    Graph::VertexId numVertices;
+    std::cin >> numVertices;
+    for (Graph::VertexId v = 0; v < numVertices; ++v) {
+        graph.AddVertex();
+    }
+    for (Graph::VertexId from = 0; from < numVertices; ++from) {
+        for (Graph::VertexId to = 0; to < numVertices; ++to) {
+            char has;
+            std::cin >> has;
+            if (has == '1') {
+                graph.AddEdge(from, to);
+            }
+        }
+    }
+    return graph;
 }
 
-//int main() {
-//    auto graph = ReadUndirectedGraph();
-//    CycleVisitor visitor;
-//
-//    Dfs(graph, visitor);
-//
-//    visitor.PrintCycle();
-//}
+int main() {
+    auto graph = ReadAdjMatrix();
+    CycleVisitor visitor(graph.NumVertices());
+
+    Dfs(graph, visitor);
+
+    visitor.PrintCycle();
+}
 
 
 
