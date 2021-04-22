@@ -1,0 +1,3 @@
+get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+add_executable(${ProjectId}_dijkstra dijkstra.cpp)
