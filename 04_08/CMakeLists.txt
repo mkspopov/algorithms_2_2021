@@ -1,4 +1,4 @@
-get_filename_component(ProjectId ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(date ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
-add_executable(${ProjectId}_graph graph.cpp)
-add_executable(${ProjectId}_first graph.cpp)
+add_executable(${date}_graph graph.cpp)
+add_executable(${date}_first graph.cpp)
